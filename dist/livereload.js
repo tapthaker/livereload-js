@@ -546,12 +546,14 @@
 
 },{}],6:[function(require,module,exports){
 (function() {
-  var PROTOCOL_6, PROTOCOL_7, Parser, ProtocolError,
+  var PROTOCOL_6, PROTOCOL_7, PROTOCOL_71, Parser, ProtocolError,
     __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
 
   exports.PROTOCOL_6 = PROTOCOL_6 = 'http://livereload.com/protocols/official-6';
 
   exports.PROTOCOL_7 = PROTOCOL_7 = 'http://livereload.com/protocols/official-7';
+
+  exports.PROTOCOL_71 = PROTOCOL_71 = 'http://livereload.com/protocols/unofficial-7.1';
 
   exports.ProtocolError = ProtocolError = (function() {
     function ProtocolError(reason, data) {
@@ -585,6 +587,8 @@
               this.protocol = 7;
             } else if (__indexOf.call(message.protocols, PROTOCOL_6) >= 0) {
               this.protocol = 6;
+            } else if (__indexOf.call(message.protocols, PROTOCOL_71) >= 0) {
+              this.protocol = 7.1;
             } else {
               throw new ProtocolError("no supported protocols found");
             }
@@ -604,8 +608,11 @@
             path: options.path,
             liveCSS: (_ref = options.apply_css_live) != null ? _ref : true
           });
-        } else {
+        } else if (this.protocol === 7) {
           message = this._parseMessage(data, ['reload', 'alert']);
+          return this.handlers.message(message);
+        } else if (this.protocol === 7.1) {
+          message = this._parseMessage(data, ['inject', 'reload', 'alert']);
           return this.handlers.message(message);
         }
       } catch (_error) {

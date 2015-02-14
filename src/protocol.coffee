@@ -1,6 +1,7 @@
 
 exports.PROTOCOL_6 = PROTOCOL_6 = 'http://livereload.com/protocols/official-6'
 exports.PROTOCOL_7 = PROTOCOL_7 = 'http://livereload.com/protocols/official-7'
+exports.PROTOCOL_71 = PROTOCOL_71 = 'http://livereload.com/protocols/unofficial-7.1'
 
 exports.ProtocolError = class ProtocolError
   constructor: (reason, data) ->
@@ -25,6 +26,8 @@ exports.Parser = class Parser
             @protocol = 7
           else if PROTOCOL_6 in message.protocols
             @protocol = 6
+          else if PROTOCOL_71 in message.protocols
+            @protocol = 7.1
           else
             throw new ProtocolError("no supported protocols found")
         @handlers.connected @protocol
@@ -37,8 +40,11 @@ exports.Parser = class Parser
           throw new ProtocolError("unknown protocol 6 command")
 
         @handlers.message command: 'reload', path: options.path, liveCSS: options.apply_css_live ? yes
-      else
+      else if @protocol == 7
         message = @_parseMessage(data, ['reload', 'alert'])
+        @handlers.message(message)
+      else if @protocol == 7.1
+        message = @_parseMessage(data,['inject','reload','alert'])
         @handlers.message(message)
     catch e
       if e instanceof ProtocolError
