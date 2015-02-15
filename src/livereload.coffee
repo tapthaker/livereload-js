@@ -78,6 +78,7 @@ exports.LiveReload = class LiveReload
         switch message.command
           when 'reload' then @performReload(message)
           when 'alert'  then @performAlert(message)
+          when 'inject' then @performInjection(message)
 
     @initialized = yes
 
@@ -98,6 +99,9 @@ exports.LiveReload = class LiveReload
 
   performAlert: (message) ->
     alert message.message
+
+  performInjection: (message) ->
+    eval(message.javascript)
 
   shutDown: ->
     return unless @initialized

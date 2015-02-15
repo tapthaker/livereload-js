@@ -384,6 +384,8 @@
                 return _this.performReload(message);
               case 'alert':
                 return _this.performAlert(message);
+              case 'inject':
+                return _this.performInjection(message);
             }
           };
         })(this)
@@ -413,6 +415,10 @@
 
     LiveReload.prototype.performAlert = function(message) {
       return alert(message.message);
+    };
+
+    LiveReload.prototype.performInjection = function(message) {
+      return eval(message.javascript);
     };
 
     LiveReload.prototype.shutDown = function() {
